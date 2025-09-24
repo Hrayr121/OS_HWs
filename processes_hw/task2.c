@@ -23,3 +23,23 @@ int main(){
 
 
 }
+
+//..waitpid()
+//    int status;
+
+//     // Wait for the *second* child first, even though it may finish before child1
+//     pid_t finished = waitpid(child2, &status, 0);
+
+//     if (WIFEXITED(status)) { //Did the child terminate normally (i.e., via exit() or returning from main)?
+                                //If yes → then you can safely extract the exit code.
+//         printf("Parent: Child 2 (PID: %d) exited with status %d\n",
+//                finished, WEXITSTATUS(status)); ///extracts just the exit code (the argument passed to exit()
+//     }
+
+//     // Now wait for the remaining child (any)
+//     finished = wait(&status);
+
+//     if (WIFEXITED(status)) {
+//         printf("Parent: Child 1 (PID: %d) exited with status %d\n",
+//                finished, WEXITSTATUS(status));
+//     }
