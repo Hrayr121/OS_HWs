@@ -27,7 +27,7 @@ int main() {
     printf("Enter %d strings (up to %d characters each):\n", numStrings, strLength);
     for (i = 0; i < numStrings; i++) {
         printf("String %d: ", i + 1);
-        fgets(arr[i], strLength + 1, stdin);
+        fgets(arr[i], strLength + 1, stdin); //scanf cannot read strings with spaces, so we use fgets
         // Remove trailing newline if present
         arr[i][strcspn(arr[i], "\n")] = '\0';
     }
@@ -59,7 +59,7 @@ int main() {
     printf("\nEnter 2 more strings:\n");
     for (i = 3; i < numStrings; i++) {
         printf("String %d: ", i + 1);
-        fgets(arr[i], strLength + 1, stdin);
+        fgets(arr[i], strLength + 1, stdin); //using fgets, because scanf cannot read strings with spaces.
         arr[i][strcspn(arr[i], "\n")] = '\0'; // Remove newline
     }
 
