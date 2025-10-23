@@ -33,16 +33,19 @@ int main() {
         scanf("%d", &arrival);
         printf("Enter burst time for P%d: ", i);
         scanf("%d", &burst);
+
         addProcess(i, arrival, burst);
     }
 
-    traverse(head);
+    traverse(head); //printing the linked list before sorting
 
     sortByArrivalTime(head);
     printf("After sorting by arrival time:\n");
-    traverse(head);
+    traverse(head); //print after sorting
     return 0;
 }
+
+
 
 void traverse(struct Process *head){
     struct Process *current = head;
@@ -57,7 +60,11 @@ printf("-----------------------------\n");
 }
 
 void addProcess(int pid, int arrival, int burst) {
-    struct Process *newP = malloc(sizeof(struct Process));
+    // the new process will be added at the end of linekd list
+
+    struct Process *newP = malloc(sizeof(struct Process)); 
+    //used malloc, because if we create a new pricess like this "struct Process newP;"" it will be stored as local variable on the stack, and will be destroyed after the function returns(after stack frame is cleaned up)
+    newP.pid = pid;
     newP->pid = pid;
     newP->arrival_time = arrival;
     newP->burst_time = burst;
@@ -68,7 +75,7 @@ void addProcess(int pid, int arrival, int burst) {
     } else {
         struct Process *temp = head;
         while (temp->next != NULL)
-            temp = temp->next;
+            temp = temp->next; // running to the end of the linkked list and adding the new process there
         temp->next = newP;
     }
 }
