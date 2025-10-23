@@ -73,22 +73,22 @@ void addProcess(int pid, int arrival, int burst) {
     if (head == NULL) {
         head = newP;
     } else {
-        struct Process *temp = head;
+        struct Process *temp = head; 
         while (temp->next != NULL)
             temp = temp->next; // running to the end of the linkked list and adding the new process there
         temp->next = newP;
     }
 }
 
-void append(struct Process *head, struct Process *newProcess) {
-    struct Process *current = head;
+// void append(struct Process *head, struct Process *newProcess) {
+//     struct Process *current = head;
 
-    while (current->next != NULL) {
-        current = current->next;
-    }
-    current->next = newProcess;
-    newProcess->next = NULL;
-}
+//     while (current->next != NULL) {
+//         current = current->next;
+//     }
+//     current->next = newProcess;
+//     newProcess->next = NULL;
+// }
 
 
 
@@ -176,3 +176,13 @@ double avgTurnaroundTime(struct Process *head) {
     return totalTurnaround / processCount;
 }
 
+void freeList(struct Process *head){
+    struct Process *current = head;
+    
+        while(current != NULL){
+            next = current->next; //saving the current Process's next pointer because after free() it will be purged.
+            free(current);
+            current = next;
+        }
+    
+}
