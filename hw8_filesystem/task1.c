@@ -7,10 +7,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 int main(){
     char src_path[512];
     char dest_path[512];
+
+    // when running the code, you can insert src_file.txt and dest_file.txt when asked, 
     printf("Enter source file path: ");
     scanf("%s", src_path);
     printf("Enter destination file path: ");
@@ -38,6 +42,7 @@ int main(){
     int total_written_bytes = 0;
 
     while((nr = read(src_fd, buffer, sizeof(buffer))) > 0){ //sizeof(buffer) tells read() the maximum number of bytes to read, but read() may read fewer bytes than that in each iteration.
+        // reads from src_fd into buffer
         nw = write(dest_fd, buffer, nr);
         if(nw == -1){
             perror("'Write' system call failed: exiting");
