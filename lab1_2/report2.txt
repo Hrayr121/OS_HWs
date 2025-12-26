@@ -1,0 +1,104 @@
+-------------------------------------------------------------------------
+objdump -d util.o -> 
+
+util.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <sum_array>:
+   0:	f3 0f 1e fa          	endbr64
+   4:	55                   	push   %rbp
+   5:	48 89 e5             	mov    %rsp,%rbp
+   8:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+   c:	89 75 e4             	mov    %esi,-0x1c(%rbp)
+   f:	66 0f ef c0          	pxor   %xmm0,%xmm0
+  13:	f2 0f 11 45 f8       	movsd  %xmm0,-0x8(%rbp)
+  18:	c7 45 f4 00 00 00 00 	movl   $0x0,-0xc(%rbp)
+  1f:	eb 30                	jmp    51 <sum_array+0x51>
+  21:	8b 45 f4             	mov    -0xc(%rbp),%eax
+  24:	48 98                	cltq
+  26:	48 8d 14 85 00 00 00 	lea    0x0(,%rax,4),%rdx
+  2d:	00 
+  2e:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
+  32:	48 01 d0             	add    %rdx,%rax
+  35:	8b 00                	mov    (%rax),%eax
+  37:	66 0f ef c0          	pxor   %xmm0,%xmm0
+  3b:	f2 0f 2a c0          	cvtsi2sd %eax,%xmm0
+  3f:	f2 0f 10 4d f8       	movsd  -0x8(%rbp),%xmm1
+  44:	f2 0f 58 c1          	addsd  %xmm1,%xmm0
+  48:	f2 0f 11 45 f8       	movsd  %xmm0,-0x8(%rbp)
+  4d:	83 45 f4 01          	addl   $0x1,-0xc(%rbp)
+  51:	8b 45 f4             	mov    -0xc(%rbp),%eax
+  54:	3b 45 e4             	cmp    -0x1c(%rbp),%eax
+  57:	7c c8                	jl     21 <sum_array+0x21>
+  59:	f2 0f 10 45 f8       	movsd  -0x8(%rbp),%xmm0
+  5e:	f2 0f 2c c0          	cvttsd2si %xmm0,%eax
+  62:	5d                   	pop    %rbp
+  63:	c3                   	ret
+
+0000000000000064 <max_array>:
+  64:	f3 0f 1e fa          	endbr64
+  68:	55                   	push   %rbp
+  a bunch of register instructions .............
+
+
+00000000000000ce <count_occurrences>:
+  ce:	f3 0f 1e fa          	endbr64
+  d2:	55                   	push   %rbp
+  d3:	48 89 e5             	mov    %rsp,%rbp
+  d6:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
+.........................
+...............
+---------------------------------------------------------------
+By "objdump"-ing we can see each function's memory offset addresses in their respective address space(starting from 0000000000000000)
+This address will later be replaced by the linker when assembling the executable file.
+
+In each case of object files, each offset will start from 0000000000000000 (for all files).
+--------
+nm util.o
+00000000000000ce T count_occurrences
+0000000000000064 T max_array
+0000000000000000 T sum_array -> we can observe the same offsets as shown in objdump
+--------
+When the linker comes into play,the linker will concatenate and arrange all .text sections
+ from different .o files and assigns each function a final offset, which we'll observe in the executable.
+
+ ----------------------------
+objump -ed the executable : this <_start> is the entry point of our program. 
+ 00000000000010c0 <_start>:
+    10c0:	f3 0f 1e fa          	endbr64
+    10c4:	31 ed                	xor    %ebp,%ebp
+    10c6:	49 89 d1             	mov    %rdx,%r9
+    10c9:	5e                   	pop    %rsi
+    10ca:	48 89 e2             	mov    %rsp,%rdx
+    10cd:	48 83 e4 f0          	and    $0xfffffffffffffff0,%rsp
+    10d1:	50                   	push   %rax
+    10d2:	54                   	push   %rsp
+    10d3:	45 31 c0             	xor    %r8d,%r8d
+    10d6:	31 c9                	xor    %ecx,%ecx
+    10d8:	48 8d 3d ca 00 00 00 	lea    0xca(%rip),%rdi        # 11a9 <main>
+ 
+    main has the following final offset: 00000000000011a9 <main>:
+    max_array : 0000000000001395 <max_array>:
+    the other functions as well.
+    ----------------------
+    readelf: 
+    A few observations here: 
+ELF (Executable and Linkable Format)
+•	size of section headers - 64 bytes - each section header is 64 bytes in ELF64
+•	Type: DYN (Position-Independent Executable file)
+•	 host machine architecture: Advanced Micro Devices X86-64
+•	  entry point's (_start) address: 0x1060
+
+
+when I objdumped the main.o file, I saw only the disassembly of the section .text and info about the main 
+function, because “objdump -d” disassembles the sections which are marked as executable. Here, with readelf -h, it says there are 14 
+section headers, which I think are some metadata, compiler info, initialized/uninitilized varibles, etc. 
+readelf -S shows us the sections inside the ELF file with their type, size, flags, and offsets.
+
++note that we have 0 program headers in our object files, because object files are not 
+executable. Later, when they are linked and assembled into an executable, we’ll have program headers there, 
+in the final executable file, which is how the OS knows how/where to map the binaries into memory during the runtime, in order to start the execution. 
+(basically, load and run the program):
+

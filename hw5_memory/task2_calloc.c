@@ -19,7 +19,7 @@ int main() {
     // Printing the initial values: Unlike malloc, calloc initilizes the values to 0 by default
     printf("\nInitial values (all zeroes):\n");
     for (int i = 0; i < n; i++) {
-        printf("%d ", arr[i]);
+        printf("%d", arr[i]);
     }
 
     // Get input from user

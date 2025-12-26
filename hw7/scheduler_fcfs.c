@@ -42,6 +42,8 @@ int main() {
     sortByArrivalTime(head);
     printf("After sorting by arrival time:\n");
     traverse(head); //print after sorting
+
+    freeList(head); //freeing the allocated memory
     return 0;
 }
 

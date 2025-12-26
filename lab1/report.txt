@@ -1,0 +1,59 @@
+Compilation stages and analysis:
+
+1. nm child_memory.o ->
+-----------------------------
+                 U __stack_chk_fail
+000000000000005a T main
+                 U printf
+                 U putchar
+                 U puts
+0000000000000000 T triple
+-----------------------------
+
+nm -ing the child_memory.o object file shows us the memory offsets of each function that's used/defined in the child_memory.c file, in their respective scopes/sections. "U" (undefiend) flags mean that these functions are used in the code, but are not yet defined -> the linker will load these functions when assembling the executable file. "T" flag shows the text segment of the memory, where our written source functions (main, and triple) reside.
+-------------
+
+gcc -E child_memory.c -o child_memory.i -> 
+
+In the child_memory.i file we can see a bunch of binaries located at "/usr/include/....", and a lot of other system stuff that will be used for the execution. At the very end of the file we can see the exact contents of our child_memory.c file.
+
+-------------------------------
+
+gcc task1.o child_memory.o -o task1
+
+------------------------------
+
+
+3. Readelf
+
+readelf -h task1 <executable>
+
+
+----------------------------
+
+4. ObjDump
+
+objdump -d task1.o
+objdump -d child_memory.o
+--> objdumping the object files with teh -d flag will show us the disassembly of the text section: aka. our written functions
+
+objdump -d task1 --> will show the disassembly of all the section headers which were mentioned with the readelf command
+
++it will show the entry point "start" function of our code, which internally calls the "main" function. ‘__libc_start_main’ is called and ‘main’ is passed as the argument.
+
+Also, the offset of our functions have shifted in the execuatble's scope: This shift is done by the linker when it arranges all .text sections together.
+
++note that we have 0 program headers in our object files, because object files are not executable. Later, when they are linked and assembled into an executable, we’ll have program headers there, in the final executable file, which is how the OS knows how/where to map the binaries into memory during the runtime, in order to start the execution. (basically, load and run the program):
+
+
+
+
+
+
+
+
+
+
+
+
+ 
